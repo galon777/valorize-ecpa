@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin · Valorize ECPA</title>
+<style>
+:root{
+  --gold:#c9a84c;--gold2:#f0d88a;--gold3:#7a5a10;
+  --goldbg:rgba(201,168,76,.1);
+  --dark:#0a0a0a;--card:#1a1a1a;--card2:#222;
+  --txt:#f0f0f0;--mid:#aaa;--soft:#666;
+  --bdr:#2a2a2a;--bdr2:#333;
+  --e:#ef5350;--c:#ffc107;--p:#43a047;--a:#1e88e5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--dark);color:var(--txt);min-height:100vh}
+
+/* ── LOGIN ── */
+#login-wrap{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.login-box{
+  background:var(--card);border:1px solid var(--bdr2);border-radius:20px;
+  padding:48px 44px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.7);
+  text-align:center;animation:up .4s ease;
+}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.login-box h1{font-size:22px;margin-bottom:6px;color:var(--txt)}
+.login-box p{color:var(--mid);font-size:14px;margin-bottom:28px}
+.login-box input{
+  width:100%;padding:14px 16px;border:2px solid var(--bdr2);border-radius:10px;
+  background:var(--card2);color:var(--txt);font-size:15px;transition:border-color .2s;
+  margin-bottom:16px;
+}
+.login-box input:focus{outline:none;border-color:var(--gold)}
+.btn-login{
+  display:block;width:100%;padding:14px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,var(--gold2),var(--gold),var(--gold3));
+  color:#1a0e00;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;
+}
+.btn-login:hover{box-shadow:0 6px 20px rgba(201,168,76,.4);transform:translateY(-1px)}
+.login-err{color:#ef5350;font-size:13px;margin-top:10px;display:none}
+.login-err.show{display:block}
+
+/* ── APP ── */
+#app{display:none;padding:0}
+
+/* header */
+.app-header{
+  background:var(--card);border-bottom:1px solid var(--bdr2);
+  padding:18px 32px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.app-header-left{display:flex;align-items:center;gap:14px}
+.app-header h1{font-size:18px;font-weight:800;color:var(--txt)}
+.app-header h1 span{color:var(--gold)}
+.tag-beta{background:var(--goldbg);border:1px solid rgba(201,168,76,.3);color:var(--gold);border-radius:50px;padding:3px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
+.btn-logout{background:transparent;border:1px solid var(--bdr2);color:var(--mid);border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--gold);color:var(--gold)}
+
+/* main */
+.app-main{padding:28px 32px;max-width:1400px;margin:0 auto}
+
+/* stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:30px}
+.stat-card{
+  background:var(--card);border:1px solid var(--bdr2);border-radius:14px;
+  padding:20px 22px;transition:border-color .2s;
+}
+.stat-card:hover{border-color:rgba(201,168,76,.3)}
+.stat-ico{font-size:26px;margin-bottom:8px}
+.stat-val{font-size:32px;font-weight:900;color:var(--gold);line-height:1}
+.stat-lbl{font-size:12px;color:var(--mid);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+/* controls */
+.controls{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.search-box{
+  flex:1;min-width:220px;padding:11px 16px;border:1px solid var(--bdr2);border-radius:10px;
+  background:var(--card2);color:var(--txt);font-size:14px;
+}
+.search-box:focus{outline:none;border-color:var(--gold)}
+.search-box::placeholder{color:var(--soft)}
+select.filter-sel{
+  padding:11px 14px;border:1px solid var(--bdr2);border-radius:10px;
+  background:var(--card2);color:var(--txt);font-size:14px;cursor:pointer;
+}
+select.filter-sel:focus{outline:none;border-color:var(--gold)}
+.btn-export{
+  padding:11px 20px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold2),var(--gold),var(--gold3));
+  color:#1a0e00;font-size:14px;font-weight:700;cursor:pointer;
+  white-space:nowrap;transition:all .2s;
+}
+.btn-export:hover{box-shadow:0 4px 16px rgba(201,168,76,.4);transform:translateY(-1px)}
+.btn-clear{
+  padding:11px 16px;border:1px solid #c62828;border-radius:10px;
+  background:transparent;color:#ef5350;font-size:13px;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.btn-clear:hover{background:#c6282822}
+
+/* table */
+.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--bdr2)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--card);position:sticky;top:66px}
+thead th{
+  padding:13px 16px;text-align:left;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.6px;color:var(--mid);
+  border-bottom:1px solid var(--bdr2);white-space:nowrap;
+}
+thead th.sort-active{color:var(--gold)}
+tbody tr{border-bottom:1px solid var(--bdr);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody td{padding:12px 16px;vertical-align:middle}
+.td-name{font-weight:700;color:var(--txt)}
+.td-phone{color:var(--mid);font-family:monospace;font-size:12px}
+.td-email{color:var(--mid);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-date{color:var(--soft);font-size:11px;white-space:nowrap}
+.profile-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  border-radius:50px;padding:4px 12px;font-size:12px;font-weight:700;
+  white-space:nowrap;
+}
+.profile-E{background:rgba(239,83,80,.18);color:#ef9a9a;border:1px solid rgba(239,83,80,.3)}
+.profile-C{background:rgba(255,193,7,.12);color:#ffd54f;border:1px solid rgba(255,193,7,.25)}
+.profile-P{background:rgba(67,160,71,.15);color:#81c784;border:1px solid rgba(67,160,71,.25)}
+.profile-A{background:rgba(30,136,229,.15);color:#64b5f6;border:1px solid rgba(30,136,229,.25)}
+.sexo-pill{display:inline-block;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:700}
+.sexo-M{background:rgba(30,136,229,.15);color:#64b5f6}
+.sexo-F{background:rgba(233,30,99,.15);color:#f48fb1}
+.scores-mini{display:flex;gap:4px}
+.sm{padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700}
+.sm-E{background:#c6282822;color:#ef9a9a}
+.sm-C{background:#ffc10715;color:#ffd54f}
+.sm-P{background:#43a04718;color:#81c784}
+.sm-A{background:#1e88e518;color:#64b5f6}
+.sm.top{opacity:1;font-weight:900} .sm{opacity:.6}
+
+/* empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--soft)}
+.empty-state .ico{font-size:48px;margin-bottom:14px}
+
+/* confirm overlay */
+#confirm-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;
+  display:none;align-items:center;justify-content:center;
+}
+#confirm-overlay.show{display:flex}
+.confirm-box{
+  background:var(--card);border:1px solid var(--bdr2);border-radius:16px;
+  padding:32px 36px;max-width:380px;text-align:center;
+}
+.confirm-box h3{font-size:18px;margin-bottom:10px;color:var(--txt)}
+.confirm-box p{color:var(--mid);font-size:14px;line-height:1.6;margin-bottom:24px}
+.confirm-btns{display:flex;gap:10px;justify-content:center}
+.confirm-btns button{padding:10px 24px;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-cancel-c{background:transparent;border:1px solid var(--bdr2);color:var(--mid)}
+.btn-cancel-c:hover{border-color:var(--gold);color:var(--gold)}
+.btn-confirm-del{background:#c62828;border:none;color:#fff}
+.btn-confirm-del:hover{background:#e53935}
+
+@media(max-width:700px){
+  .app-header{padding:14px 16px}
+  .app-main{padding:18px 14px}
+  .controls{flex-direction:column;align-items:stretch}
+  .search-box{min-width:unset}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN ════ -->
+<div id="login-wrap">
+  <div class="login-box">
+    <svg viewBox="0 0 180 140" width="70" height="55" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px">
+      <defs>
+        <linearGradient id="gva" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f0d88a"/><stop offset="45%" stop-color="#c9a84c"/><stop offset="100%" stop-color="#8b6420"/>
+        </linearGradient>
+        <filter id="gla"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <polygon points="2,4 38,4 90,102 54,102" fill="url(#gva)"/>
+      <polygon points="178,4 142,4 90,102 126,102" fill="url(#gva)"/>
+      <g filter="url(#gla)"><path d="M90,108 C90,108 72,95 72,83 C72,74 80,69 90,78 C100,69 108,74 108,83 C108,95 90,108 90,108Z" fill="#f5e6b8"/></g>
+    </svg>
+    <h1>Painel <span style="color:var(--gold)">Valorize</span></h1>
+    <p>Acesso restrito à equipe interna</p>
+    <input id="pwd-input" type="password" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-login" onclick="doLogin()">Entrar →</button>
+    <div class="login-err" id="login-err">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- ════ APP ════ -->
+<div id="app">
+  <div class="app-header">
+    <div class="app-header-left">
+      <svg viewBox="0 0 180 140" width="32" height="25" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gvh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f0d88a"/><stop offset="100%" stop-color="#8b6420"/></linearGradient></defs>
+        <polygon points="2,4 38,4 90,102 54,102" fill="url(#gvh)"/>
+        <polygon points="178,4 142,4 90,102 126,102" fill="url(#gvh)"/>
+        <path d="M90,108 C90,108 72,95 72,83 C72,74 80,69 90,78 C100,69 108,74 108,83 C108,95 90,108 90,108Z" fill="#f5e6b8"/>
+      </svg>
+      <h1><span>Valorize</span> · Painel ECPA</h1>
+      <span class="tag-beta">ADMIN</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">Sair</button>
+  </div>
+
+  <div class="app-main">
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row"></div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <input class="search-box" id="search-input" type="text" placeholder="🔍  Buscar por nome, telefone ou e-mail…" oninput="renderTable()"/>
+      <select class="filter-sel" id="filter-profile" onchange="renderTable()">
+        <option value="">Todos os perfis</option>
+        <option value="Executor">🦊 Executor</option>
+        <option value="Comunicador">🦜 Comunicador</option>
+        <option value="Planejador">🐢 Planejador</option>
+        <option value="Analista">🦉 Analista</option>
+      </select>
+      <select class="filter-sel" id="filter-sexo" onchange="renderTable()">
+        <option value="">Todos os sexos</option>
+        <option value="Masculino">🧑 Masculino</option>
+        <option value="Feminino">👩 Feminino</option>
+      </select>
+      <button class="btn-export" onclick="exportCSV()">⬇️ Exportar CSV</button>
+      <button class="btn-clear" onclick="showConfirmClear()">🗑️ Limpar tudo</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table id="leads-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Telefone</th>
+            <th>E-mail</th>
+            <th>Sexo</th>
+            <th>Perfil Principal</th>
+            <th>Perfil Secundário</th>
+            <th>Pontuação</th>
+            <th>Data/Hora</th>
+          </tr>
+        </thead>
+        <tbody id="leads-body"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none">
+        <div class="ico">📋</div>
+        <div>Nenhum cadastro encontrado.<br>Quando as pessoas realizarem o teste, os dados aparecerão aqui.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM OVERLAY -->
+<div id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>⚠️ Limpar todos os dados?</h3>
+    <p>Esta ação vai apagar <strong>permanentemente</strong> todos os cadastros e resultados. Não poderá ser desfeita.</p>
+    <div class="confirm-btns">
+      <button class="btn-cancel-c" onclick="hideConfirm()">Cancelar</button>
+      <button class="btn-confirm-del" onclick="clearAllLeads()">Sim, apagar tudo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── SENHA ── */
+const ADMIN_PWD = 'valorize2024';
+
+function doLogin(){
+  const v = document.getElementById('pwd-input').value;
+  if(v === ADMIN_PWD){
+    document.getElementById('login-wrap').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadDashboard();
+  } else {
+    document.getElementById('login-err').classList.add('show');
+    document.getElementById('pwd-input').value='';
+    document.getElementById('pwd-input').focus();
+  }
+}
+function doLogout(){
+  document.getElementById('login-wrap').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('pwd-input').value='';
+  document.getElementById('login-err').classList.remove('show');
+}
+
+/* ── DADOS ── */
+function getLeads(){ return JSON.parse(localStorage.getItem('ecpa_leads')||'[]'); }
+
+const PROFILE_KEYS = {
+  'Executor':'E','Comunicador':'C','Planejador':'P','Analista':'A',
+};
+const PROFILE_EMOJIS = {
+  'Executor':'🦊','Comunicador':'🦜','Planejador':'🐢','Analista':'🦉',
+};
+
+/* ── DASHBOARD ── */
+function loadDashboard(){
+  renderStats();
+  renderTable();
+}
+
+function renderStats(){
+  const leads = getLeads();
+  const total = leads.length;
+
+  // Profile distribution
+  const pc = {Executor:0,Comunicador:0,Planejador:0,Analista:0};
+  const sx = {Masculino:0,Feminino:0};
+  leads.forEach(l=>{
+    if(pc[l.perfil_principal] !== undefined) pc[l.perfil_principal]++;
+    if(sx[l.sexo] !== undefined) sx[l.sexo]++;
+  });
+  const topPerfil = total ? Object.entries(pc).sort((a,b)=>b[1]-a[1])[0] : null;
+
+  const row = document.getElementById('stats-row');
+  row.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-ico">👥</div>
+      <div class="stat-val">${total}</div>
+      <div class="stat-lbl">Total de Cadastros</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">🦊</div>
+      <div class="stat-val">${pc.Executor}</div>
+      <div class="stat-lbl">Executores</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">🦜</div>
+      <div class="stat-val">${pc.Comunicador}</div>
+      <div class="stat-lbl">Comunicadores</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">🐢</div>
+      <div class="stat-val">${pc.Planejador}</div>
+      <div class="stat-lbl">Planejadores</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">🦉</div>
+      <div class="stat-val">${pc.Analista}</div>
+      <div class="stat-lbl">Analistas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">🧑</div>
+      <div class="stat-val">${sx.Masculino}</div>
+      <div class="stat-lbl">Masculino</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico">👩</div>
+      <div class="stat-val">${sx.Feminino}</div>
+      <div class="stat-lbl">Feminino</div>
+    </div>
+    ${topPerfil ? `<div class="stat-card">
+      <div class="stat-ico">🏆</div>
+      <div class="stat-val" style="font-size:18px">${PROFILE_EMOJIS[topPerfil[0]]} ${topPerfil[0]}</div>
+      <div class="stat-lbl">Perfil mais comum</div>
+    </div>` : ''}
+  `;
+}
+
+function renderTable(){
+  const leads = getLeads();
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const fp = document.getElementById('filter-profile').value;
+  const fs = document.getElementById('filter-sexo').value;
+
+  const filtered = leads.filter(l=>{
+    const matchQ = !q || l.nome.toLowerCase().includes(q) ||
+      l.telefone.includes(q) || l.email.toLowerCase().includes(q);
+    const matchP = !fp || l.perfil_principal === fp;
+    const matchS = !fs || l.sexo === fs;
+    return matchQ && matchP && matchS;
+  });
+
+  const body = document.getElementById('leads-body');
+  const empty = document.getElementById('empty-state');
+
+  if(filtered.length === 0){
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    document.querySelector('.table-wrap table').style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  document.querySelector('.table-wrap table').style.display = 'table';
+
+  body.innerHTML = filtered.map((l, idx)=>{
+    const pk = PROFILE_KEYS[l.perfil_principal] || 'E';
+    const sk = PROFILE_KEYS[l.perfil_secundario] || 'C';
+    const scores = {E:l.pontos_E||0, C:l.pontos_C||0, P:l.pontos_P||0, A:l.pontos_A||0};
+    const maxVal = Math.max(...Object.values(scores));
+
+    const scoreHtml = ['E','C','P','A'].map(k=>`
+      <span class="sm sm-${k} ${scores[k]===maxVal?'top':''}">${k}:${scores[k]}</span>
+    `).join('');
+
+    return `<tr>
+      <td style="color:var(--soft);font-size:12px">${idx+1}</td>
+      <td class="td-name">${esc(l.nome)}</td>
+      <td class="td-phone">${esc(l.telefone)}</td>
+      <td class="td-email" title="${esc(l.email)}">${esc(l.email)}</td>
+      <td><span class="sexo-pill sexo-${l.sexo==='Masculino'?'M':'F'}">${l.sexo==='Masculino'?'🧑':'👩'} ${l.sexo}</span></td>
+      <td><span class="profile-badge profile-${pk}">${PROFILE_EMOJIS[l.perfil_principal]||''} ${esc(l.perfil_principal)}</span></td>
+      <td><span class="profile-badge profile-${sk}" style="opacity:.8">${PROFILE_EMOJIS[l.perfil_secundario]||''} ${esc(l.perfil_secundario)}</span></td>
+      <td><div class="scores-mini">${scoreHtml}</div></td>
+      <td class="td-date">${esc(l.data)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(str){
+  if(!str) return '—';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── CSV EXPORT ── */
+function exportCSV(){
+  const leads = getLeads();
+  if(!leads.length){ alert('Nenhum dado para exportar.'); return; }
+
+  const headers = ['Nome','Telefone','Email','Sexo','Perfil Principal','Perfil Secundário','E','C','P','A','Data/Hora'];
+  const rows = leads.map(l=>[
+    l.nome, l.telefone, l.email, l.sexo,
+    l.perfil_principal, l.perfil_secundario,
+    l.pontos_E, l.pontos_C, l.pontos_P, l.pontos_A,
+    l.data,
+  ].map(v=>'"'+(String(v||'').replace(/"/g,'""'))+'"').join(','));
+
+  const csv = '﻿' + [headers.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `valorize_leads_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── CLEAR ── */
+function showConfirmClear(){ document.getElementById('confirm-overlay').classList.add('show'); }
+function hideConfirm(){ document.getElementById('confirm-overlay').classList.remove('show'); }
+function clearAllLeads(){
+  localStorage.removeItem('ecpa_leads');
+  hideConfirm();
+  renderStats();
+  renderTable();
+}
+</script>
+</body>
+</html>
