@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ECPA · Valorize</title>
+<style>
+:root{
+  --e:#c62828;--e-l:#ffebee;--e-m:#ef5350;
+  --c:#b34700;--c-l:#fff8e1;--c-m:#ffc107;
+  --p:#1b5e20;--p-l:#e8f5e9;--p-m:#43a047;
+  --a:#0d47a1;--a-l:#e3f2fd;--a-m:#1e88e5;
+  --gold:#c9a84c;--gold2:#f0d88a;--gold3:#7a5a10;
+  --goldbg:rgba(201,168,76,.11);
+  --dark:#0a0a0a;--card:#fff;
+  --txt:#1a1a1a;--mid:#555;--soft:#888;
+  --bdr:#e2e2e2;--bg:#f7f8fc;
+  --r:18px;--sh:0 20px 64px rgba(0,0,0,.48);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--dark);min-height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(201,168,76,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.wrap{width:100%;max-width:720px;position:relative}
+
+/* ── CARD ── */
+.screen{
+  display:none;background:var(--card);border-radius:var(--r);
+  padding:44px 50px;box-shadow:var(--sh);
+  border:1px solid rgba(201,168,76,.18);animation:up .42s ease;
+}
+.screen.active{display:block}
+@keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TIPO ── */
+h1{font-size:26px;color:var(--txt);margin-bottom:6px}
+h2{font-size:20px;color:var(--txt);margin-bottom:16px}
+p{color:var(--mid);line-height:1.75;font-size:15px;margin-bottom:12px}
+
+/* ── LOGO ── */
+.vlogo{text-align:center;margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--bdr)}
+.vlogo-name{
+  font-size:28px;font-weight:900;letter-spacing:4px;
+  background:linear-gradient(135deg,var(--gold2),var(--gold),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-transform:uppercase;margin-top:10px;
+}
+.vlogo-tag{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-top:2px;font-weight:600}
+.ecpa-pills{display:flex;justify-content:center;gap:6px;margin-top:14px}
+.ep{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:white}
+.ep-e{background:var(--e)}.ep-c{background:var(--c-m)}.ep-p{background:var(--p-m)}.ep-a{background:var(--a-m)}
+
+/* ── GREETING ── */
+.greeting{
+  background:linear-gradient(135deg,#fdf6e3,#faf0cc);
+  border-left:4px solid var(--gold);border-radius:12px;
+  padding:22px 26px;margin:20px 0 26px;position:relative;overflow:hidden;
+}
+.greeting::before{content:'\201C';font-size:90px;font-family:Georgia,serif;color:var(--gold);opacity:.12;position:absolute;top:-10px;left:8px;line-height:1}
+.greeting p{color:#6b4f0a;font-style:italic;line-height:1.85;margin:0;padding-left:24px;font-size:15px}
+
+/* ── FIELD ── */
+.field{margin:18px 0}
+.field label{display:block;font-size:14px;font-weight:700;color:var(--txt);margin-bottom:7px}
+.field input{
+  width:100%;padding:13px 16px;border:2px solid var(--bdr);border-radius:10px;
+  font-size:15px;color:var(--txt);transition:border-color .2s,box-shadow .2s;
+}
+.field input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+
+/* ── RADIO SELECT ── */
+.radio-group{display:flex;gap:12px;margin-top:6px}
+.radio-opt{display:flex;align-items:center;gap:10px;padding:13px 20px;border:2px solid var(--bdr);border-radius:10px;cursor:pointer;transition:all .2s;flex:1;justify-content:center}
+.radio-opt:hover{border-color:var(--gold);background:var(--goldbg)}
+.radio-opt input[type=radio]{display:none}
+.radio-opt.sel{border-color:var(--gold);background:var(--goldbg);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+.radio-opt .r-ico{font-size:22px}
+.radio-opt .r-lbl{font-size:15px;font-weight:700;color:var(--txt)}
+.field-err{font-size:13px;color:#c62828;margin-top:6px;display:none}
+.field-err.show{display:block}
+
+/* ── BUTTONS ── */
+.btn{display:block;width:100%;padding:15px 32px;border:none;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer;transition:transform .18s,box-shadow .18s}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:none}
+.btn-primary{background:linear-gradient(135deg,var(--gold2),var(--gold),var(--gold3));color:#1a0e00;margin-top:10px;box-shadow:0 4px 18px rgba(201,168,76,.35)}
+.btn-primary:hover{box-shadow:0 8px 28px rgba(201,168,76,.55)}
+.btn-ghost{background:transparent;color:var(--soft);border:2px solid var(--bdr);width:auto;padding:12px 26px;margin-top:0}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold3);box-shadow:none}
+.btn-row{display:flex;gap:12px;margin-top:26px}
+.btn-row .btn-primary{flex:1;margin-top:0}
+
+/* ── INSTRUCTIONS ── */
+.ins-item{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--bdr);font-size:15px;color:var(--mid);line-height:1.6}
+.ins-item:last-child{border-bottom:none}
+.ins-item .ico{font-size:22px;flex-shrink:0;margin-top:2px}
+.tag{display:inline-block;background:var(--goldbg);border:1px solid rgba(201,168,76,.3);border-radius:50px;padding:5px 16px;font-size:13px;font-weight:700;color:var(--gold3);margin-bottom:18px}
+
+/* ── PROGRESS ── */
+.prog{margin-bottom:26px}
+.prog-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--soft);margin-bottom:6px}
+.prog-bar{height:7px;background:var(--bdr);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:4px;transition:width .4s}
+
+/* ── RANKING QUESTION ── */
+.q-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:8px}
+.q-legend{
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--goldbg);border:1px solid rgba(201,168,76,.25);border-radius:8px;
+  padding:8px 14px;margin-bottom:16px;font-size:13px;color:var(--gold3);font-weight:600;
+}
+.q-legend span{display:flex;align-items:center;gap:6px}
+
+/* rank status */
+.rank-status{
+  text-align:center;font-size:13px;font-weight:700;
+  padding:8px;border-radius:8px;margin-bottom:14px;
+  background:var(--bg);color:var(--soft);transition:all .3s;
+}
+.rank-status.done{background:#e8f5e9;color:#2e7d32}
+
+/* group rows */
+.rank-rows{display:flex;flex-direction:column;gap:10px}
+.rank-row{
+  display:flex;align-items:center;gap:14px;
+  border:2px solid var(--bdr);border-radius:13px;
+  padding:14px 16px;transition:border-color .2s,background .2s;
+  background:white;
+}
+.rank-row.has-rank{border-color:rgba(201,168,76,.5);background:#fdf6e3}
+.rank-row.rank-4{border-color:var(--gold);background:linear-gradient(135deg,#fdf6e3,#faf0cc)}
+
+/* rank badge (selected number shown big) */
+.rank-badge{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;
+  border:2px solid var(--bdr);color:var(--soft);
+  flex-shrink:0;transition:all .25s;
+}
+.rank-row.has-rank .rank-badge{
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  border-color:var(--gold);color:#1a0e00;
+}
+.rank-row.rank-4 .rank-badge{
+  background:linear-gradient(135deg,var(--gold2),var(--gold),var(--gold3));
+  box-shadow:0 2px 10px rgba(201,168,76,.4);
+}
+
+/* words */
+.rank-words{flex:1;display:flex;flex-direction:column;gap:3px}
+.rank-word{font-size:14px;font-weight:600;color:var(--txt);line-height:1.3}
+
+/* rank buttons */
+.rank-btns{display:flex;gap:5px;flex-shrink:0}
+.rb{
+  width:34px;height:34px;border:2px solid var(--bdr);border-radius:8px;
+  background:white;font-size:14px;font-weight:700;color:var(--soft);
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;
+}
+.rb:hover{border-color:var(--gold);color:var(--gold3)}
+.rb.active{background:linear-gradient(135deg,var(--gold2),var(--gold));border-color:var(--gold);color:#1a0e00}
+.rb.used{opacity:.3;pointer-events:none}
+
+/* ── PROCESSING ── */
+.proc{text-align:center;padding:24px 0}
+.spin-big{width:70px;height:70px;border:6px solid var(--bdr);border-top-color:var(--gold);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 26px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.proc h2{text-align:center}.proc p{text-align:center}
+.proc-steps{list-style:none;max-width:340px;margin:26px auto 0}
+.proc-step{display:flex;align-items:center;gap:12px;padding:9px 0;font-size:14px;color:var(--soft);border-bottom:1px solid var(--bdr)}
+.proc-step:last-child{border-bottom:none}
+.proc-step.done{color:#2e7d32}
+
+/* ── RESULT HERO ── */
+.hero{border-radius:16px;padding:30px 28px;text-align:center;margin-bottom:22px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.08) 0%,transparent 100%);pointer-events:none}
+.hero-animal{font-size:66px;display:block;margin-bottom:8px;line-height:1}
+.hero-name{font-size:30px;font-weight:900;color:white;margin-bottom:4px}
+.hero-kw{font-size:13px;color:rgba(255,255,255,.8);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.hero-desc{font-size:14px;color:rgba(255,255,255,.92);line-height:1.78;margin:0}
+.score-pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:20px}
+.spill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:50px;padding:6px 16px;font-size:13px;font-weight:700;color:white}
+.spill.top{background:rgba(255,255,255,.38)}
+.sec-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px;font-size:14px;color:var(--mid)}
+.sec-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+
+/* ── DETAIL CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 22px}
+.card{background:var(--bg);border-radius:12px;padding:15px 16px;border:1px solid var(--bdr)}
+.card-ico{font-size:20px;margin-bottom:6px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gold3);margin-bottom:8px}
+.card ul{list-style:none}
+.card li{font-size:13px;color:var(--mid);line-height:1.5;padding:3px 0 3px 12px;position:relative}
+.card li::before{content:'•';position:absolute;left:0;color:var(--gold)}
+
+/* ── ANA / HR ── */
+.hr-block{margin-top:4px}
+.hr-loading{text-align:center;padding:22px;color:var(--soft);font-size:14px}
+.spin-sm{display:inline-block;width:18px;height:18px;border:3px solid var(--bdr);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+.hr-card{background:linear-gradient(135deg,#fdf6e3 0%,#faf0cc 100%);border-left:4px solid var(--gold);border-radius:14px;padding:26px 30px}
+.hr-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--gold2),var(--gold),var(--gold3));color:#1a0e00;border-radius:50px;padding:5px 16px;font-size:12px;font-weight:700;margin-bottom:16px}
+.hr-text{color:#5c3d0a;font-size:15px;line-height:1.9;font-style:italic}
+.hr-text p{color:#5c3d0a;font-style:italic;margin-bottom:14px}
+.hr-text p:last-child{margin-bottom:0}
+
+/* ── FOOTER ── */
+.r-footer{text-align:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--bdr)}
+.btn-restart{background:transparent;color:var(--soft);border:2px solid var(--bdr);border-radius:50px;padding:10px 28px;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-restart:hover{border-color:var(--gold);color:var(--gold3)}
+.v-stamp{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--soft);margin-top:14px}
+.v-stamp strong{color:var(--gold);font-size:13px}
+
+/* ── CONFETTI ── */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}
+
+/* ── RESPONSIVE ── */
+@media(max-width:580px){
+  .screen{padding:28px 18px}
+  h1{font-size:21px}
+  .cards{grid-template-columns:1fr 1fr}
+  .rb{width:28px;height:28px;font-size:12px}
+  .rank-badge{width:32px;height:32px;font-size:15px}
+}
+@media(max-width:400px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ════ BOAS-VINDAS ════ -->
+<div id="s-welcome" class="screen active">
+  <div class="vlogo">
+    <svg viewBox="0 0 180 140" width="100" height="78" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gv" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f0d88a"/>
+          <stop offset="45%" stop-color="#c9a84c"/>
+          <stop offset="100%" stop-color="#8b6420"/>
+        </linearGradient>
+        <filter id="gl"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <polygon points="2,4 38,4 90,102 54,102" fill="url(#gv)"/>
+      <polygon points="178,4 142,4 90,102 126,102" fill="url(#gv)"/>
+      <g filter="url(#gl)">
+        <path d="M90,108 C90,108 72,95 72,83 C72,74 80,69 90,78 C100,69 108,74 108,83 C108,95 90,108 90,108Z" fill="#f5e6b8"/>
+      </g>
+    </svg>
+    <div class="vlogo-name">Valorize</div>
+    <div class="vlogo-tag">Reconhecimento que conecta.</div>
+    <div class="ecpa-pills">
+      <div class="ep ep-e">E</div><div class="ep ep-c">C</div>
+      <div class="ep ep-p">P</div><div class="ep ep-a">A</div>
+    </div>
+  </div>
+
+  <div class="greeting">
+    <p>
+      Olá! Que alegria ter você aqui! ✨<br><br>
+      Na <strong>Valorize</strong>, acreditamos profundamente que cada pessoa carrega um valor único — e é isso que vamos descobrir juntos hoje. O <strong>ECPA</strong> é uma ferramenta de autoconhecimento que nos ajuda a entender como você pensa, age, se conecta e contribui com o mundo ao seu redor.<br><br>
+      Não existe perfil melhor ou pior. Cada um tem seu brilho, sua essência, seu lugar especial no time.<br>
+      <strong>Obrigado por confiar na Valorize e por embarcar nessa jornada de reconhecimento! 💛</strong>
+    </p>
+  </div>
+
+  <div class="field">
+    <label for="inp-name">Qual é o seu nome?</label>
+    <input id="inp-name" type="text" placeholder="Digite seu nome completo…"/>
+  </div>
+
+  <button class="btn btn-primary" onclick="goInstructions()">Começar minha avaliação →</button>
+</div>
+
+<!-- ════ CADASTRO ════ -->
+<div id="s-register" class="screen">
+  <div class="vlogo" style="margin-bottom:18px;padding-bottom:16px">
+    <svg viewBox="0 0 180 140" width="64" height="50" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gvr" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f0d88a"/><stop offset="45%" stop-color="#c9a84c"/><stop offset="100%" stop-color="#8b6420"/>
+        </linearGradient>
+        <filter id="glr"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <polygon points="2,4 38,4 90,102 54,102" fill="url(#gvr)"/>
+      <polygon points="178,4 142,4 90,102 126,102" fill="url(#gvr)"/>
+      <g filter="url(#glr)"><path d="M90,108 C90,108 72,95 72,83 C72,74 80,69 90,78 C100,69 108,74 108,83 C108,95 90,108 90,108Z" fill="#f5e6b8"/></g>
+    </svg>
+  </div>
+
+  <h1 style="margin-bottom:6px">Quase lá, <span id="reg-name-hi" style="color:var(--gold3)"></span>! 🌟</h1>
+  <p style="margin-bottom:22px">Antes de começar, precisamos de algumas informações para guardar seu resultado.</p>
+
+  <div class="field">
+    <label for="inp-phone">📱 Telefone (com DDD)</label>
+    <input id="inp-phone" type="tel" placeholder="(45) 99999-9999" oninput="maskPhone(this)" maxlength="15" autocomplete="tel"/>
+    <div class="field-err" id="err-phone">Informe um telefone válido com DDD.</div>
+  </div>
+
+  <div class="field">
+    <label for="inp-email">✉️ E-mail</label>
+    <input id="inp-email" type="email" placeholder="seuemail@exemplo.com" autocomplete="email"/>
+    <div class="field-err" id="err-email">Informe um e-mail válido.</div>
+  </div>
+
+  <div class="field">
+    <label>👤 Sexo</label>
+    <div class="radio-group">
+      <label class="radio-opt" id="opt-m" onclick="selectSexo('M')">
+        <input type="radio" name="sexo" value="M"/>
+        <span class="r-ico">🧑</span><span class="r-lbl">Masculino</span>
+      </label>
+      <label class="radio-opt" id="opt-f" onclick="selectSexo('F')">
+        <input type="radio" name="sexo" value="F"/>
+        <span class="r-ico">👩</span><span class="r-lbl">Feminino</span>
+      </label>
+    </div>
+    <div class="field-err" id="err-sexo">Selecione uma opção.</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('s-welcome')">← Voltar</button>
+    <button class="btn btn-primary" onclick="goFromRegister()">Continuar →</button>
+  </div>
+</div>
+
+<!-- ════ INSTRUÇÕES ════ -->
+<div id="s-instructions" class="screen">
+  <h1>Como funciona o ECPA?</h1>
+  <span class="tag">✦ 10 rodadas · ~5 minutos</span>
+
+  <div class="ins-item"><span class="ico">🎯</span><span>Em cada rodada você verá <strong>4 grupos de palavras</strong>. Você precisa <strong>classificar todos os 4</strong> de 1 a 4.</span></div>
+  <div class="ins-item"><span class="ico">4️⃣</span><span><strong>4</strong> = o grupo que <strong>mais</strong> te representa · <strong>3</strong> = te representa bastante · <strong>2</strong> = um pouco · <strong>1</strong> = o que <strong>menos</strong> te representa</span></div>
+  <div class="ins-item"><span class="ico">⚡</span><span>Cada número só pode ser usado uma vez por rodada. Vá de instinto — a primeira resposta costuma ser a mais verdadeira.</span></div>
+  <div class="ins-item"><span class="ico">🔒</span><span>Suas respostas são <strong>confidenciais</strong> e usadas exclusivamente para fins de desenvolvimento na Valorize.</span></div>
+  <div class="ins-item"><span class="ico">✨</span><span>Ao final, você receberá seu <strong>perfil comportamental completo</strong> com uma mensagem personalizada da Ana, nossa especialista de RH.</span></div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('s-welcome')">← Voltar</button>
+    <button class="btn btn-primary" onclick="startQuiz()">Iniciar →</button>
+  </div>
+</div>
+
+<!-- ════ QUIZ ════ -->
+<div id="s-quiz" class="screen">
+  <div class="prog">
+    <div class="prog-meta">
+      <span id="q-counter">Rodada 1 de 10</span>
+      <span id="q-pct">0%</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <p class="q-num" id="q-num">Rodada 1</p>
+
+  <div class="q-legend">
+    <span>1️⃣ Menos me identifica</span>
+    <span>4️⃣ Mais me identifica</span>
+  </div>
+
+  <div class="rank-status" id="rank-status">Classifique todos os 4 grupos</div>
+
+  <div class="rank-rows" id="rank-rows"></div>
+
+  <div class="btn-row" style="margin-top:22px">
+    <button class="btn btn-ghost" id="btn-prev" onclick="prevQ()">← Anterior</button>
+    <button class="btn btn-primary" id="btn-next" onclick="nextQ()">Próxima →</button>
+  </div>
+</div>
+
+<!-- ════ PROCESSANDO ════ -->
+<div id="s-proc" class="screen">
+  <div class="proc">
+    <div class="spin-big"></div>
+    <h2>Mapeando seu perfil…</h2>
+    <p>A Valorize está analisando suas escolhas com cuidado.</p>
+    <ul class="proc-steps">
+      <li class="proc-step" id="st1"><span>⏳</span> Processando suas respostas…</li>
+      <li class="proc-step" id="st2"><span>⏳</span> Identificando perfil predominante…</li>
+      <li class="proc-step" id="st3"><span>⏳</span> Gerando análise comportamental…</li>
+      <li class="proc-step" id="st4"><span>⏳</span> Ana preparando sua mensagem especial…</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════ RESULTADO ════ -->
+<div id="s-result" class="screen">
+  <div class="hero" id="r-hero">
+    <span class="hero-animal" id="r-animal"></span>
+    <div class="hero-name" id="r-pname"></div>
+    <div class="hero-kw" id="r-kw"></div>
+    <p class="hero-desc" id="r-desc"></p>
+    <div class="score-pills" id="r-pills"></div>
+  </div>
+
+  <div class="sec-row" id="r-sec"></div>
+  <div class="cards" id="r-cards"></div>
+
+  <div class="hr-block">
+    <div class="hr-loading" id="hr-loading">
+      <span class="spin-sm"></span> Ana (RH · Valorize) está preparando sua mensagem especial…
+    </div>
+    <div class="hr-card" id="hr-card" style="display:none">
+      <div class="hr-badge">👩‍💼 Ana · Especialista de RH · Valorize</div>
+      <div class="hr-text" id="hr-text"></div>
+    </div>
+  </div>
+
+  <div class="r-footer">
+    <button class="btn-restart" onclick="restart()">↺ Refazer o teste</button>
+    <div class="v-stamp">
+      <svg width="18" height="14" viewBox="0 0 180 140" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gvs" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f0d88a"/><stop offset="100%" stop-color="#8b6420"/></linearGradient></defs>
+        <polygon points="2,4 38,4 90,102 54,102" fill="url(#gvs)"/>
+        <polygon points="178,4 142,4 90,102 126,102" fill="url(#gvs)"/>
+        <path d="M90,108 C90,108 72,95 72,83 C72,74 80,69 90,78 C100,69 108,74 108,83 C108,95 90,108 90,108Z" fill="#f5e6b8"/>
+      </svg>
+      <strong>Valorize</strong> · Reconhecimento que conecta.
+    </div>
+  </div>
+</div>
+
+</div>
+<canvas id="confetti"></canvas>
+<script>
+/* ═══════════════════════════════════
+   CONFIG
+═══════════════════════════════════ */
+const GEMINI_KEY = 'AIzaSyCiR1vCD-MB4G8rvysq6oE8rWI7Rl61DXk';
+const GEMINI_MODEL = 'gemini-2.0-flash';
+
+/* ═══════════════════════════════════
+   PERFIS
+═══════════════════════════════════ */
+const PROFILES = {
+  E:{
+    label:'Executor',letter:'E',emoji:'🦊',animal:'Raposa',
+    color:'#c62828',light:'#ffebee',mid:'#ef5350',keyword:'Ação',
+    desc:'Orientado para resultados, o Executor decide rápido e vai direto ao ponto. É assertivo, corajoso e não recua diante de desafios. Sua energia transforma ideias em realidade e inspira ação em todos ao redor.',
+    behavioral:['Autoconfiante, assertivo e decidido','Odeia lentidão, indecisão e burocracia','Intenso e totalmente comprometido com o que acredita'],
+    stimuli:['Vencer, conquistar e resolver problemas','Ser reconhecido pela performance e pelos resultados'],
+    blockers:['Ambientes burocráticos e controladores','Falta de autonomia para agir e decidir'],
+    work:['Lidera naturalmente em qualquer situação','Resolve crises com velocidade e determinação','Não se adapta bem a gestores passivos ou excessivamente controladores'],
+    lead:['Direta, desafiadora e exigente com performance','Inspira pela força, pela determinação e pelos resultados concretos'],
+    grow:['Desenvolver empatia genuína e escuta ativa','Aprender que gentileza e resultado convivem e se potencializam','Confiar mais na equipe e aprender a delegar com leveza'],
+  },
+  C:{
+    label:'Comunicador',letter:'C',emoji:'🦜',animal:'Papagaio',
+    color:'#b34700',light:'#fff8e1',mid:'#ffc107',keyword:'Inspiração',
+    desc:'Extrovertido e magnético, o Comunicador energiza qualquer ambiente que entra. Inspira pessoas com entusiasmo genuíno, cria conexões poderosas e vive de interações humanas. Sua criatividade e otimismo são verdadeiramente contagiantes.',
+    behavioral:['Extrovertido, entusiasmado e naturalmente cativante','Valoriza profundamente como é percebido e como conecta as pessoas','Fala com paixão, pensa em voz alta e energiza quem está perto'],
+    stimuli:['Ser aceito, admirado e genuinamente ouvido','Reconhecimento público e visibilidade social'],
+    blockers:['Ambientes rígidos, frios ou excessivamente formais','Isolamento social e ausência de interação humana'],
+    work:['Brilha em apresentações, vendas, marketing e eventos','Excelente para motivar times, gerar ideias e criar engajamento','Precisa de apoio estruturado na execução e cumprimento de prazos'],
+    lead:['Inspiradora, emocional e genuinamente entusiástica','Conquista pelo carisma, pela conexão e pelo poder da sua presença'],
+    grow:['Aprender a ouvir com a mesma intensidade com que fala','Desenvolver disciplina de planejamento e organização','Cultivar abertura real e madura para feedbacks e críticas construtivas'],
+  },
+  P:{
+    label:'Planejador',letter:'P',emoji:'🐢',animal:'Tartaruga',
+    color:'#1b5e20',light:'#e8f5e9',mid:'#43a047',keyword:'Segurança',
+    desc:'A âncora da equipe. O Planejador é paciente, confiável e profundamente cooperativo. Preza pela estabilidade e pelos relacionamentos harmoniosos. É o profissional que cumpre o que promete e constrói confiança real ao longo do tempo.',
+    behavioral:['Amável, paciente e genuinamente colaborativo','Precisa sentir-se seguro, útil e parte importante do que está construindo','Valoriza relações sólidas e ambientes de trabalho tranquilos e harmoniosos'],
+    stimuli:['Estabilidade, senso de pertencimento e harmonia nas relações','Ser reconhecido como parte essencial e insubstituível do time'],
+    blockers:['Mudanças repentinas impostas sem preparação ou diálogo','Conflitos diretos e situações de confronto aberto'],
+    work:['Excelente em rotinas, suporte estratégico e gestão de processos','Extremamente fiel à equipe, à missão e aos valores da empresa','Pode resistir a inovações muito rápidas — precisa de transição cuidadosa'],
+    lead:['Cuidadosa, presente, empática e ouvinte de verdade','Constrói confiança profunda e duradoura — a liderança que fica na memória'],
+    grow:['Desenvolver iniciativa e coragem para tomar decisões sem precisar de certeza total','Trabalhar a autoconfiança e aprender a se impor com gentileza','Aprender que se posicionar com firmeza é um ato de respeito por si mesmo(a)'],
+  },
+  A:{
+    label:'Analista',letter:'A',emoji:'🦉',animal:'Coruja',
+    color:'#0d47a1',light:'#e3f2fd',mid:'#1e88e5',keyword:'Precisão',
+    desc:'O Analista vê o que os outros não veem. Detalhista, lógico e metódico, garante que decisões sejam tomadas com base em dados e análise profunda. É a garantia de qualidade, consistência e excelência de qualquer equipe.',
+    behavioral:['Lógico, estruturado e focado em padrões, dados e evidências','Busca excelência genuína e faz perguntas certeiras antes de agir','Profundamente comprometido, mesmo que sua intensidade seja mais interna que visível'],
+    stimuli:['Entendimento profundo, coerência e exatidão nos detalhes','Ser respeitado pela sua competência técnica e pela profundidade do seu conhecimento'],
+    blockers:['Ambiguidade, subjetividade e decisões baseadas apenas em emoção','Erros públicos — a exposição do que considera imperfeito lhe pesa muito'],
+    work:['Brilha em auditorias, planejamento, jurídico, financeiro e controle de qualidade','Garante que processos sejam robustos, confiáveis e bem documentados','Trabalha melhor com autonomia técnica e regras bem definidas'],
+    lead:['Exigente, técnico e absolutamente justo na cobrança','Lidera com integridade, dados sólidos e processos que protegem a todos'],
+    grow:['Desenvolver confiança emocional e aprender a ser mais flexível em situações ambíguas','Reduzir o medo de errar — a imperfeição é o preço do crescimento real','Praticar a leveza de aceitar que nem tudo precisa ser controlado para ser bom'],
+  },
+};
+
+/* ═══════════════════════════════════
+   QUESTÕES (10 rodadas — grupos originais ECPA)
+═══════════════════════════════════ */
+const QS = [
+  {opts:[{k:'P',w:['Acolhedor','Amigável','Paciente']},{k:'A',w:['Autodisciplinado','Atento a detalhes','Diligente']},{k:'E',w:['Autoconfiante','Independente','Dominante']},{k:'C',w:['Comunicativo','Alegre','Extrovertido']}]},
+  {opts:[{k:'P',w:['Agradável','Tranquilo','Organizado']},{k:'A',w:['Criterioso','Cuidadoso','Especialista']},{k:'E',w:['Pró-ativo','Empreendedor','Corajoso']},{k:'C',w:['Participativo','Relacional','Flexível']}]},
+  {opts:[{k:'P',w:['Calmo','Rotineiro','Constante']},{k:'A',w:['Idealizador','Perfeccionista','Especialista']},{k:'E',w:['Prático','Rápido','Eficiente']},{k:'C',w:['Persuasivo','Contagiante','Estimulador']}]},
+  {opts:[{k:'P',w:['Conciliador','Conselheiro','Bom ouvinte']},{k:'A',w:['Conforme','Sistemático','Sensato']},{k:'E',w:['Objetivo','Assertivo','Focado em resultados']},{k:'C',w:['Criativo','Falante','Distraído']}]},
+  {opts:[{k:'P',w:['Comedido','Amável','Mediador']},{k:'A',w:['Preciso','Lógico','Racional']},{k:'E',w:['Determinado','Firme','Enérgico']},{k:'C',w:['Divertido','Emotivo','Preza pelo prazer']}]},
+  {opts:[{k:'P',w:['Autocontrolado','Conservador','Responsável']},{k:'A',w:['Profundo','Perceptivo','Estratégico']},{k:'E',w:['Lutador','Combativo','Agressivo']},{k:'C',w:['Solidário','Facilitador','Influenciador']}]},
+  {opts:[{k:'P',w:['Persistente','Prevenido','Tolerante']},{k:'A',w:['Exato','Exigente','Estruturado']},{k:'E',w:['Automotivado','Pioneiro','Impulsionador']},{k:'C',w:['Articulador','Empolgante','Motivador']}]},
+  {opts:[{k:'P',w:['Aconselhador','Harmônico','Apoiador']},{k:'A',w:['Ponderado','Ordenado','Analisador']},{k:'E',w:['Resolvedor','Destemido','Desafiador']},{k:'C',w:['Vaidoso','Simpático','Gosta de ser reconhecido']}]},
+  {opts:[{k:'P',w:['Moderado','Equilibrado','Estável']},{k:'A',w:['Teórico','Conservador','Aprofunda conhecimentos']},{k:'E',w:['Competitivo','Assume riscos','Desbravador']},{k:'C',w:['Entusiasmado','Impulsivo','Otimista']}]},
+  {opts:[{k:'P',w:['Educado','Observador','Diplomático']},{k:'A',w:['Regulador','Técnico','Orientador']},{k:'E',w:['Direcionador','Solucionador','Audacioso']},{k:'C',w:['Agregador','Sociável','Mobilidade']}]},
+];
+
+/* ═══════════════════════════════════
+   ESTADO
+   rowRanks[i] = [rank0, rank1, rank2, rank3] para os grupos na ordem embaralhada
+═══════════════════════════════════ */
+let S = {
+  name:'', telefone:'', email:'', sexo:'',
+  cur:0,
+  shuf: [],      // shuf[i] = [origIdx0, origIdx1, origIdx2, origIdx3]
+  rowRanks: [],  // rowRanks[i] = [rankAtDisplay0, rankAtDisplay1, ...]
+  gemTxt: null,
+};
+
+/* ═══════════════════════════════════
+   NAVEGAÇÃO
+═══════════════════════════════════ */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goInstructions(){
+  const n = document.getElementById('inp-name').value.trim();
+  if(!n){ document.getElementById('inp-name').focus(); return; }
+  S.name = n;
+  document.getElementById('reg-name-hi').textContent = n.split(' ')[0];
+  goTo('s-register');
+}
+function startQuiz(){
+  S.cur = 0;
+  S.shuf = QS.map(()=>{
+    const a=[0,1,2,3];
+    for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    return a;
+  });
+  S.rowRanks = QS.map(()=>[null,null,null,null]);
+  renderQ();
+  goTo('s-quiz');
+}
+
+/* ═══════════════════════════════════
+   RENDER QUESTÃO
+═══════════════════════════════════ */
+function renderQ(){
+  const i = S.cur;
+  const pct = Math.round(i/10*100);
+  document.getElementById('q-counter').textContent = `Rodada ${i+1} de 10`;
+  document.getElementById('q-pct').textContent = `${pct}%`;
+  document.getElementById('prog-fill').style.width = `${pct}%`;
+  document.getElementById('q-num').textContent = `Rodada ${i+1}`;
+
+  const ranks = S.rowRanks[i];
+  const assigned = ranks.filter(r=>r!==null).length;
+  const statusEl = document.getElementById('rank-status');
+  if(assigned===4){
+    statusEl.textContent = '✅ Todos os 4 grupos classificados!';
+    statusEl.className = 'rank-status done';
+  } else {
+    statusEl.textContent = `${assigned} de 4 classificados${assigned===0?' — comece escolhendo o 4 (mais você)':''}`;
+    statusEl.className = 'rank-status';
+  }
+
+  const container = document.getElementById('rank-rows');
+  container.innerHTML = '';
+
+  S.shuf[i].forEach((origIdx, dispIdx)=>{
+    const opt = QS[i].opts[origIdx];
+    const currentRank = ranks[dispIdx];
+    const usedRanks = new Set(ranks.filter(r=>r!==null));
+
+    const row = document.createElement('div');
+    row.className = 'rank-row' +
+      (currentRank ? (currentRank===4?' rank-4':' has-rank') : '');
+
+    const badge = document.createElement('div');
+    badge.className = 'rank-badge';
+    badge.textContent = currentRank || '?';
+
+    const words = document.createElement('div');
+    words.className = 'rank-words';
+    words.innerHTML = opt.w.map(w=>`<span class="rank-word">${w}</span>`).join('');
+
+    const btns = document.createElement('div');
+    btns.className = 'rank-btns';
+    [1,2,3,4].forEach(val=>{
+      const b = document.createElement('button');
+      b.className = 'rb' +
+        (currentRank===val?' active':'') +
+        (usedRanks.has(val) && currentRank!==val?' used':'');
+      b.textContent = val;
+      b.onclick = ()=>assignRank(i, dispIdx, val);
+      btns.appendChild(b);
+    });
+
+    row.appendChild(badge);
+    row.appendChild(words);
+    row.appendChild(btns);
+    container.appendChild(row);
+  });
+
+  document.getElementById('btn-prev').style.display = i===0?'none':'block';
+  document.getElementById('btn-next').textContent = i===9?'Ver meu resultado ✓':'Próxima →';
+}
+
+/* ═══════════════════════════════════
+   ATRIBUIR RANK
+═══════════════════════════════════ */
+function assignRank(qIdx, dispIdx, val){
+  const ranks = S.rowRanks[qIdx];
+  // Limpar o mesmo valor se já estiver em outro grupo
+  const prev = ranks.findIndex((r,idx)=> r===val && idx!==dispIdx);
+  if(prev !== -1) ranks[prev] = null;
+  // Atribuir ao grupo atual
+  ranks[dispIdx] = val;
+  renderQ();
+}
+
+/* ═══════════════════════════════════
+   NAVEGAÇÃO ENTRE QUESTÕES
+═══════════════════════════════════ */
+function isComplete(i){ return S.rowRanks[i].every(r=>r!==null); }
+function nextQ(){
+  if(!isComplete(S.cur)){
+    shake(document.getElementById('rank-rows'));
+    return;
+  }
+  if(S.cur < 9){ S.cur++; renderQ(); }
+  else processResults();
+}
+function prevQ(){ if(S.cur>0){ S.cur--; renderQ(); } }
+function shake(el){ el.style.animation='none'; void el.offsetHeight; el.style.animation='shake .4s ease'; }
+
+/* ═══════════════════════════════════
+   CALCULAR SCORES
+   Total = 10 rodadas × (1+2+3+4) = 10×10 = 100
+═══════════════════════════════════ */
+function calcScores(){
+  const s = {E:0, C:0, P:0, A:0};
+  QS.forEach((q, i)=>{
+    S.rowRanks[i].forEach((rank, dispIdx)=>{
+      if(rank !== null){
+        const origIdx = S.shuf[i][dispIdx];
+        s[q.opts[origIdx].k] += rank;
+      }
+    });
+  });
+  return s; // soma total = 100
+}
+function topTwo(s){
+  const sorted = Object.entries(s).sort((a,b)=>b[1]-a[1]);
+  return { primary: sorted[0][0], secondary: sorted[1][0] };
+}
+
+/* ═══════════════════════════════════
+   PROCESSAR RESULTADO
+═══════════════════════════════════ */
+async function processResults(){
+  goTo('s-proc');
+  const mark = id=>{
+    const el = document.getElementById(id);
+    el.classList.add('done');
+    el.querySelector('span').textContent = '✅';
+  };
+  await delay(600); mark('st1');
+  await delay(500); mark('st2');
+  await delay(500); mark('st3');
+
+  const scores = calcScores();
+  const {primary, secondary} = topTwo(scores);
+  S.gemTxt = null;
+
+  try {
+    S.gemTxt = await callGemini(S.name, primary, secondary, scores);
+  } catch(e){ console.error('Gemini:', e); }
+
+  await delay(400); mark('st4');
+  await delay(400);
+  showResult(scores, primary, secondary);
+}
+
+/* ═══════════════════════════════════
+   EXIBIR RESULTADO
+═══════════════════════════════════ */
+function showResult(scores, pK, sK){
+  saveLead(scores, pK, sK);
+  const pp = PROFILES[pK], sp = PROFILES[sK];
+
+  // Hero
+  const hero = document.getElementById('r-hero');
+  hero.style.background = `linear-gradient(135deg, ${pp.color}ee, ${pp.color}88)`;
+  document.getElementById('r-animal').textContent = pp.emoji;
+  document.getElementById('r-pname').textContent = `Perfil ${pp.label}`;
+  document.getElementById('r-kw').textContent = `${pp.emoji} ${pp.animal} · Palavra-chave: ${pp.keyword}`;
+  document.getElementById('r-desc').textContent = pp.desc;
+
+  // Score pills (percentual sobre 100)
+  const pills = document.getElementById('r-pills');
+  pills.innerHTML = '';
+  ['E','C','P','A'].forEach(k=>{
+    const d = document.createElement('div');
+    d.className = 'spill' + (k===pK?' top':'');
+    d.textContent = `${PROFILES[k].letter}: ${scores[k]}pts`;
+    pills.appendChild(d);
+  });
+
+  // Secundário
+  document.getElementById('r-sec').innerHTML = `
+    <div class="sec-dot" style="background:${sp.color}"></div>
+    <span>Perfil secundário: <strong style="color:${sp.color}">${sp.emoji} ${sp.label}</strong> — ${scores[sK]} pontos</span>`;
+
+  // Cards
+  const defs = [
+    {ico:'⚛️',title:'Estilo comportamental',items:pp.behavioral},
+    {ico:'🧠',title:'Estímulos internos',items:pp.stimuli},
+    {ico:'🚫',title:'Travamentos',items:pp.blockers},
+    {ico:'💼',title:'No trabalho',items:pp.work},
+    {ico:'🎯',title:'Estilo de liderança',items:pp.lead},
+    {ico:'🛠️',title:'Como desenvolver',items:pp.grow},
+  ];
+  document.getElementById('r-cards').innerHTML = defs.map(d=>`
+    <div class="card">
+      <div class="card-ico">${d.ico}</div>
+      <div class="card-title">${d.title}</div>
+      <ul>${d.items.map(it=>`<li>${it}</li>`).join('')}</ul>
+    </div>`).join('');
+
+  // Mensagem Ana
+  if(S.gemTxt){
+    document.getElementById('hr-loading').style.display = 'none';
+    document.getElementById('hr-card').style.display = 'block';
+    document.getElementById('hr-text').innerHTML =
+      '<p>' + S.gemTxt.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+  } else {
+    document.getElementById('hr-loading').style.display = 'none';
+    document.getElementById('hr-card').style.display = 'block';
+    document.getElementById('hr-text').innerHTML = '<p>' + fallbackHR(S.name, pp, sp) + '</p>';
+  }
+
+  goTo('s-result');
+  launchConfetti();
+}
+
+/* ═══════════════════════════════════
+   GEMINI API — Persona Ana, RH Valorize
+═══════════════════════════════════ */
+async function callGemini(name, pK, sK, scores){
+  const pp = PROFILES[pK], sp = PROFILES[sK];
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+
+  const prompt = `Você é a Ana, especialista em Recursos Humanos da Valorize com 15 anos de experiência em desenvolvimento humano e comportamental. Você acredita profundamente que cada ser humano carrega uma luz única — e que reconhecê-la é o primeiro passo para transformar vidas.
+
+Você acabou de receber o resultado do ECPA de ${name}:
+• Perfil PREDOMINANTE: ${pp.label} (${pp.emoji} ${pp.animal}) — ${scores[pK]} de ${total} pontos
+• Perfil SECUNDÁRIO: ${sp.label} (${sp.emoji} ${sp.animal}) — ${scores[sK]} pontos
+• Distribuição: E=${scores.E}, C=${scores.C}, P=${scores.P}, A=${scores.A} (total=${total})
+
+Escreva uma mensagem profundamente humana e emocionalmente rica para ${name}. Siga estas diretrizes com o coração:
+
+1. PARÁGRAFO 1 — Acolhimento humano: Cumprimente ${name} pelo nome com calor genuíno e celebre QUEM ela é como pessoa, não apenas como profissional. Reconheça a coragem e a abertura de se autoconhecer. Mencione a Valorize com afeto.
+
+2. PARÁGRAFO 2 — Elogio generoso e concreto: Celebre 2-3 qualidades humanas profundas do perfil ${pp.label}. Diga como essas qualidades impactam a vida das pessoas ao redor de ${name}, como ela provavelmente faz as pessoas se sentirem melhores, mais seguras ou mais inspiradas apenas pela sua presença. Seja emocionalmente generoso(a) — não genérico. Mencione o perfil secundário ${sp.label} como uma camada extra de riqueza que muito poucas pessoas têm.
+
+3. PARÁGRAFO 3 — Convite ao crescimento (com amor): Com muita delicadeza, firmeza e respeito, aponte 1 área de desenvolvimento importante — não como fraqueza, mas como um convite para ${name} desabrochar ainda mais. Fale como alguém que genuinamente acredita no potencial dessa pessoa e quer vê-la ainda mais plena.
+
+4. PARÁGRAFO 4 — Fecho emocional e poderoso: Encerre com uma mensagem que faça ${name} se sentir vista, valorizada e inspirada como ser humano único — não apenas como colaborador(a). Uma frase que ela possa guardar. Que a faça saber que a Valorize enxerga além do currículo, além da função — enxerga a pessoa extraordinária que ela é.
+
+Tom: como uma carta de uma mentora que genuinamente ama, respeita e acredita nessa pessoa. Caloroso, humano, direto ao coração. NÃO seja corporativo — seja humano.
+Máximo 4 parágrafos. Português brasileiro fluente. Escreva APENAS a mensagem.`;
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`,
+    {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{temperature:0.92, maxOutputTokens:700},
+      })
+    }
+  );
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+}
+
+/* ═══════════════════════════════════
+   FALLBACK (quando Gemini falha)
+═══════════════════════════════════ */
+function fallbackHR(name, pp, sp){
+  const msgs = {
+    Executor:`${name}, você é uma força da natureza — e isso não é só sobre trabalho. É sobre como você vive, como você enfrenta a vida de frente, sem medo. Sua coragem de decidir quando outros hesitam, sua energia que arrasta projetos e pessoas do imobilismo para a ação — isso não é apenas um traço profissional. É quem você é como ser humano. E isso é raro, genuinamente raro.<br><br>
+Com a influência do perfil ${sp.label} em você, você tem uma riqueza ainda maior: a capacidade de agir com força e ao mesmo tempo trazer algo que vai além da execução. As pessoas ao seu redor, mesmo sem perceber, se sentem mais seguras porque você existe. Você dá estrutura, dá direção, dá impulso — e isso transforma vidas.<br><br>
+Um convite, com todo o carinho: permita-se também escutar. Não só ouvir — escutar de verdade. A empatia não enfraquece a sua força, ela a multiplica. E as pessoas ao seu redor vão te amar ainda mais por isso.<br><br>
+A Valorize tem profundo orgulho de ter você. Você não é só um talento — você é uma presença que faz diferença. Continue sendo essa pessoa extraordinária que você é, ${name}. O mundo precisa de você. 💛`,
+
+    Comunicador:`${name}, você é luz. E não é exagero — é literal. Você entra num ambiente e ele muda. As pessoas sorriem mais, falam mais, acreditam mais. Esse dom de conectar e de fazer as pessoas se sentirem vistas e valorizadas é um dos dons mais preciosos que um ser humano pode ter.<br><br>
+O perfil ${sp.label} que vive em você adiciona uma profundidade especial à sua expressividade. Você não é só carisma — você tem substância. E quando essas duas coisas se encontram, o resultado é uma pessoa capaz de mover corações e transformar realidades.<br><br>
+Com todo o amor: trabalhe sua escuta. Não para falar menos, mas para sentir mais. E construa disciplina para que suas ideias brilhantes aterrisem no mundo de verdade. Você tem o dom da inspiração — agora cultive o dom da concretização.<br><br>
+A Valorize te enxerga, ${name} — como profissional e, mais do que isso, como ser humano único e insubstituível. Você faz as pessoas ao redor se sentirem melhores. E isso, em si, já é um legado. 💛`,
+
+    Planejador:`${name}, sabe qual é o seu superpoder? Você faz as pessoas se sentirem seguras. Num mundo frenético e cheio de incertezas, você é a presença que ancora, que acolhe, que garante que as coisas vão funcionar. Isso não tem preço. Literalmente.<br><br>
+Com a riqueza adicional do perfil ${sp.label}, você é ainda mais completo(a). Você traz consistência sem rigidez, cuidado sem dependência, lealdade sem ingenuidade. Quem tem você por perto sabe que pode contar — de verdade. E poucas coisas na vida são tão valiosas quanto isso.<br><br>
+Um convite para você, com carinho: confie mais na sua voz. Sua opinião importa muito mais do que você imagina. Assertividade não é agressividade — é respeito por si mesmo(a). E quando você se posiciona, você inspira outros a fazerem o mesmo.<br><br>
+A Valorize te vê, ${name}. Você é o tipo de pessoa que faz um time se tornar uma família. E isso não é uma soft skill — é uma dádiva. Obrigado por ser quem você é. 💛`,
+
+    Analista:`${name}, você tem um dom que pouquíssimas pessoas têm: você vê o que os outros não conseguem enxergar. Os detalhes que passam despercebidos, os riscos que ninguém mapeou, as conexões que ninguém fez — você encontra. E isso protege, melhora e eleva tudo ao seu redor.<br><br>
+Com o perfil secundário ${sp.label} colorindo sua forma de ser, você tem uma dimensão humana que vai muito além da técnica. Você não é apenas preciso — você é profundo. E essa profundidade, quando compartilhada, tem o poder de transformar equipes inteiras.<br><br>
+Um convite com muito respeito: permita-se errar. Não porque errar é bom, mas porque o medo do erro pode te impedir de mostrar ao mundo o quanto você tem a oferecer. A sua inteligência merece espaço para respirar, para arriscar, para voar.<br><br>
+A Valorize tem um orgulho imenso de ter você. Você é o tipo de pessoa que eleva o padrão de tudo que toca. Não como pressão, mas como presença. Continue sendo essa pessoa extraordinária, ${name}. Você é essencial. 💛`,
+  };
+  return msgs[pp.label] || msgs.Analista;
+}
+
+/* ═══════════════════════════════════
+   REGISTRO / CADASTRO
+═══════════════════════════════════ */
+function maskPhone(input){
+  let v = input.value.replace(/\D/g,'');
+  if(v.length > 11) v = v.slice(0,11);
+  if(v.length === 0) input.value = '';
+  else if(v.length <= 2) input.value = '(' + v;
+  else if(v.length <= 7) input.value = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else input.value = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+}
+function selectSexo(val){
+  S.sexo = val;
+  document.getElementById('opt-m').classList.toggle('sel', val==='M');
+  document.getElementById('opt-f').classList.toggle('sel', val==='F');
+  document.getElementById('err-sexo').classList.remove('show');
+}
+function goFromRegister(){
+  const phone = document.getElementById('inp-phone').value.trim();
+  const email = document.getElementById('inp-email').value.trim();
+  let ok = true;
+
+  const phoneRaw = phone.replace(/\D/g,'');
+  if(phoneRaw.length < 10){
+    document.getElementById('err-phone').classList.add('show'); ok=false;
+  } else { document.getElementById('err-phone').classList.remove('show'); }
+
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    document.getElementById('err-email').classList.add('show'); ok=false;
+  } else { document.getElementById('err-email').classList.remove('show'); }
+
+  if(!S.sexo){
+    document.getElementById('err-sexo').classList.add('show'); ok=false;
+  }
+
+  if(!ok) return;
+  S.telefone = phone;
+  S.email = email;
+  goTo('s-instructions');
+}
+
+/* ═══════════════════════════════════
+   SALVAR LEAD (localStorage)
+═══════════════════════════════════ */
+function saveLead(scores, pK, sK){
+  try {
+    const leads = JSON.parse(localStorage.getItem('ecpa_leads')||'[]');
+    leads.push({
+      id: Date.now(),
+      nome: S.name,
+      telefone: S.telefone,
+      email: S.email,
+      sexo: S.sexo === 'M' ? 'Masculino' : 'Feminino',
+      perfil_principal: PROFILES[pK].label,
+      perfil_secundario: PROFILES[sK].label,
+      pontos_E: scores.E,
+      pontos_C: scores.C,
+      pontos_P: scores.P,
+      pontos_A: scores.A,
+      data: new Date().toLocaleString('pt-BR'),
+    });
+    localStorage.setItem('ecpa_leads', JSON.stringify(leads));
+  } catch(e){ console.warn('Erro ao salvar lead:', e); }
+}
+
+/* ═══════════════════════════════════
+   RESTART
+═══════════════════════════════════ */
+function restart(){
+  S.gemTxt = null;
+  S.telefone = ''; S.email = ''; S.sexo = '';
+  document.getElementById('hr-loading').style.display = 'block';
+  document.getElementById('hr-card').style.display = 'none';
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-phone').value = '';
+  document.getElementById('inp-email').value = '';
+  document.getElementById('opt-m').classList.remove('sel');
+  document.getElementById('opt-f').classList.remove('sel');
+  goTo('s-welcome');
+}
+
+/* ═══════════════════════════════════
+   CONFETTI DOURADO
+═══════════════════════════════════ */
+function launchConfetti(){
+  const cv = document.getElementById('confetti');
+  const ctx = cv.getContext('2d');
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const cols = ['#c9a84c','#f0d88a','#8b6420','#1b5e20','#c62828','#0d47a1','#ffc107','#fff'];
+  const ps = Array.from({length:130},()=>({
+    x:Math.random()*cv.width, y:Math.random()*-cv.height,
+    w:6+Math.random()*8, h:9+Math.random()*9,
+    col:cols[Math.floor(Math.random()*cols.length)],
+    vx:(Math.random()-.5)*2.5, vy:1.8+Math.random()*2.8,
+    rot:Math.random()*360, vr:(Math.random()-.5)*5,
+  }));
+  let f=0;
+  (function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      ctx.save(); ctx.translate(p.x+p.w/2, p.y+p.h/2);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.col; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(++f<210) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+/* ═══════════════════════════════════
+   UTILS
+═══════════════════════════════════ */
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+const sty = document.createElement('style');
+sty.textContent = `@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`;
+document.head.appendChild(sty);
+</script>
+</body>
+</html>
